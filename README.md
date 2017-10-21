@@ -20,11 +20,12 @@ Say you defined your config in some file, and you're using css modules.
 
 /* ignore the terrible breakpoints */
 @value arbitaryValue: media-value(
-  case: "only screen and (min-width: 1501px)" as: 50px,
-  case: "only screen and (min-width: 901px) and (max-width: 1500px)" as: 40px,
-  case: "only screen and (min-width: 601px) and (max-width: 900px)" as: 30px,
-  case: "only screen and (min-width: 376px) and (max-width: 600px)" as: 20px,
-  case: "only screen and (max-width: 375px)" as: 10px,
+  case: "only screen and (min-width: 1501px)" as: "50px",
+  case: "only screen and (min-width: 901px) and (max-width: 1500px)" as: "40px",
+  case: "only screen and (min-width: 601px) and (max-width: 900px)" as: "30px",
+  case: "only screen and (min-width: 376px) and (max-width: 600px)" as: "20px",
+  case: "only screen and (max-width: 375px)" as: "10px",
+  else: "0"
 );
 ```
 

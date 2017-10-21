@@ -1,9 +1,7 @@
 // @flow
 
-/*
- * A list of indexes from a child node to its parents
- */
-export type Path = Array<number>
+import Path from '~/data/path'
+
 
 export default class PathMap<A> {
   _children: Map<number, ChildMap<A>>
@@ -19,7 +17,7 @@ export default class PathMap<A> {
   }
 
   _lookupNode (path: Path, cursor: number): ChildMap<A> {
-    const index = path[cursor]
+    const index = path.nthFromLeaf(cursor)
     let child = this._children.get(index)
 
     // it's possible the path being made here is a new one

@@ -1,5 +1,5 @@
 {
-  "name": "@akst.io/postcss-responsive-value",
+  "name": "@akst.io/postcss-media-value",
   "version": "0.1.0",
   "description": "",
   "main": "./dist/src/index.js",

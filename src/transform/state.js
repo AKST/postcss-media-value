@@ -1,8 +1,8 @@
-import type { ResponsiveValue } from '~/parsing'
 import type { Path } from '~/data/path-map'
 import PathMap from '~/data/path-map'
 
-export type NodeInfo = { value: ResponsiveValue }
+export type MediaValueMap = Map<any, string>
+export type NodeInfo = { map: MediaValueMap }
 
 export default class State {
   _nodes: PathMap<NodeInfo>
@@ -11,8 +11,8 @@ export default class State {
     this._nodes = new PathMap()
   }
 
-  record (path: Path, node: ResponsiveValue) {
-    this._nodes.record(path, { value: node })
+  record (path: Path, map: MediaValueMap) {
+    this._nodes.record(path, { map })
   }
 }
 
