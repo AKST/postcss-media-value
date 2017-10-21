@@ -139,13 +139,42 @@ export function expandProperty (segments: Array<Segment>, defaultKey: any): Expa
   return { type: 'ok', value: resultMap }
 }
 
+
+function lookupMediaRule (
+  rule: Object,
+  mediaQuery: string,
+  map: Map<Object, Map<string, Object>>,
+): Object {
+  let queryMap = map.get(rule)
+  if (queryMap == null) {
+    queryMap = new Map()
+    map.set(rule, queryMap)
+  }
+
+  let mediaRule = queryMap.get(mediaQuery)
+  if (mediaRule == null) {
+    mediaRule = postcss.rule({ selector: rule.selector })
+
+    rule.after(postcss.atRule({
+      name: 'media',
+      params: mediaQuery,
+      nodes: [mediaRule],
+    }))
+
+    queryMap.set(mediaQuery, mediaRule)
+  }
+
+  return mediaRule
+}
+
 export function applyUpdate (state: State, root: Object, elseKey: any = defaultKey) {
   // type Instruction = {}
   // const instructions: Array<Instruction> = []
+  const map = new Map()
 
   for (const [path, info] of state.updatePaths()) {
     const decl = util.lookup(path, root)
-    const ruleOriginal = decl.parent
+    const rule = decl.parent
 
     for (const [mediaQuery, value] of info.mediaMap) {
       if (mediaQuery === elseKey) {
@@ -153,11 +182,8 @@ export function applyUpdate (state: State, root: Object, elseKey: any = defaultK
         clone.value = value
       }
       else {
-        const mediaAt = postcss.atRule({ name: 'media', params: mediaQuery })
-        const mediaRule = postcss.rule({ selector: ruleOriginal.selector })
-        mediaRule.append(postcss.decl({ prop: info.propName, value }))
-        mediaAt.append(mediaRule)
-        ruleOriginal.after(mediaAt)
+        const mediaRule = lookupMediaRule(rule, mediaQuery, map)
+        mediaRule.prepend(postcss.decl({ prop: info.propName, value }))
       }
     }
 
