@@ -3,7 +3,7 @@
 ## About
 
 This is a [postCSS][PostCSS] plugin that allows you to define a responsive
-value. For resuse it is suggested you use this with css modules.
+value. For reuse I recommend you use something like css modules.
 
 ## Installation
 
@@ -13,7 +13,7 @@ yarn add @akst.io/postcss-media-value
 
 ## Usage
 
-Say you defined your config in some file.
+Say you defined your config in some file, and you're using css modules.
 
 ```css
 /* app/styles/grid.css */
@@ -24,7 +24,7 @@ Say you defined your config in some file.
   case: "only screen and (min-width: 901px) and (max-width: 1500px)" as: 40px,
   case: "only screen and (min-width: 601px) and (max-width: 900px)" as: 30px,
   case: "only screen and (min-width: 376px) and (max-width: 600px)" as: 20px,
-  case: "only screen and (max-width: 375px)" as: 50px,
+  case: "only screen and (max-width: 375px)" as: 10px,
 );
 ```
 
