@@ -1,13 +1,17 @@
-import { create as createState } from './state'
-import { parsePropertyValue } from '~/parsing'
+// @flow
 
-export function readDecl (state, decl) {
-  const result = parsePropertyValue(decl.value)
+import State, { create as createState } from '~/transform/state'
+import * as util from '~/transform/util'
+import { parseProperty } from '~/parsing'
+
+export function readDecl (state: State, decl: Object) {
+  const result = parseProperty(decl.value)
   switch (result.type) {
     case 'normal': return
     case 'error': throw decl.error(result.reason)
     case 'responsive': {
-      console.log(result.value)
+      const path = util.getPath(decl)
+      state.record(path, result.segments)
       break
     }
   }
