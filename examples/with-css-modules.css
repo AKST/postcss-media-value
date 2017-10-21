@@ -1,0 +1,43 @@
+@value iPhoneWidthMax: 375px;
+@value desktopWidthMin: 376px;
+
+@value $lineHeight: media-value(
+  case: 'only screen and (min-width: iPhoneWidthMax)' as: '20px',
+  case: 'only screen and (max-width: desktopWidthMin)' as: '25px',
+);
+
+@value $padding: media-value(
+  case: 'only screen and (min-width: iPhoneWidthMax)' as: '1.25em',
+  case: 'only screen and (max-width: desktopWidthMin)' as: '1.75em',
+  else: '1em',
+);
+
+.button {
+  font-size: 16px;
+  height: calc($lineHeight * 2);
+  line-height: $lineHeight;
+  padding: $padding;
+}
+
+/* output */
+
+.button {
+  font-size: 16px;
+  padding: 1em;
+}
+
+@media only screen and (min-width: 375px) {
+  .button {
+    height: calc(20px * 2);
+    line-height: 20px;
+    padding: 1.25px;
+  }
+}
+
+@media only screen and (max-width: 376px) {
+  .button {
+    height: calc(25px * 2);
+    line-height: 25px;
+    padding: 1.75px;
+  }
+}
