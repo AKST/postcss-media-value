@@ -1,3 +1,5 @@
+.ignore {}
+
 .rule {
   border: solid media-value(
     case: "only screen and (min-width: 1501px)" as: "50px",
@@ -7,4 +9,10 @@
     case: "only screen and (max-width: 375px)" as: "10px",
     else: "0",
   ) black;
+
+  font-size: 12px;
+
+  &:placeholder {
+    opacity: media-value(else: "0.5");
+  }
 }

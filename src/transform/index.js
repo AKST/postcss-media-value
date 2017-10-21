@@ -2,6 +2,7 @@
 import type { Segment } from '~/parsing'
 import type { MediaValueMap } from '~/transform/state'
 
+import postcss from 'postcss'
 import { enumerate } from '~/util/iterators'
 import State, { create as createState } from '~/transform/state'
 import * as util from '~/transform/util'
@@ -9,6 +10,13 @@ import { parseProperty } from '~/parsing'
 
 const defaultKey = Symbol('default')
 
+/**
+ * Analysis a declaration and records any updates
+ * that will need to occur.
+ *
+ * @param state - The state of the transformation.
+ * @param decl - A declartion that's being analysised.
+ */
 export function readDecl (state: State, decl: Object) {
   // parse the property and get the AST of the properties value
   const result = parseProperty(decl.value)
@@ -23,7 +31,11 @@ export function readDecl (state: State, decl: Object) {
         case 'error': throw decl.error(reduceResult.reason)
         case 'ok': {
           const path = util.getPath(decl)
-          state.record(path, reduceResult.value)
+
+          state.record(path, {
+            propName: decl.prop,
+            mediaMap: reduceResult.value,
+          })
           break
         }
       }
@@ -125,6 +137,33 @@ export function expandProperty (segments: Array<Segment>, defaultKey: any): Expa
   }
 
   return { type: 'ok', value: resultMap }
+}
+
+export function applyUpdate (state: State, root: Object, elseKey: any = defaultKey) {
+  // type Instruction = {}
+  // const instructions: Array<Instruction> = []
+
+  for (const [path, info] of state.updatePaths()) {
+    const decl = util.lookup(path, root)
+    const ruleOriginal = decl.parent
+
+    for (const [mediaQuery, value] of info.mediaMap) {
+      if (mediaQuery === elseKey) {
+        const clone = decl.cloneAfter()
+        clone.value = value
+      }
+      else {
+        const mediaAt = postcss.atRule({ name: 'media', params: mediaQuery })
+        const mediaRule = postcss.rule({ selector: ruleOriginal.selector })
+        mediaRule.append(postcss.decl({ prop: info.propName, value }))
+        mediaAt.append(mediaRule)
+        ruleOriginal.after(mediaAt)
+      }
+    }
+
+    // no long needed
+    decl.remove()
+  }
 }
 
 export { createState }

@@ -40,6 +40,11 @@ class Builder {
   }
 }
 
+export type PathBuilder = Builder
+
+export function fromRootToLeaf (path: Array<number>): Path {
+  return new Path(path.reverse())
+}
 
 export function makePathBuilder () {
   return new Builder()

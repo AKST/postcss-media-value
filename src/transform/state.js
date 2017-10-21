@@ -1,8 +1,13 @@
-import type { Path } from '~/data/path-map'
+// @flow
+
+import Path from '~/data/path'
 import PathMap from '~/data/path-map'
 
 export type MediaValueMap = Map<any, string>
-export type NodeInfo = { map: MediaValueMap }
+export type NodeInfo = {
+  propName: string,
+  mediaMap: MediaValueMap,
+}
 
 export default class State {
   _nodes: PathMap<NodeInfo>
@@ -11,8 +16,12 @@ export default class State {
     this._nodes = new PathMap()
   }
 
-  record (path: Path, map: MediaValueMap) {
-    this._nodes.record(path, { map })
+  record (path: Path, nodeInfo: NodeInfo) {
+    this._nodes.record(path, nodeInfo)
+  }
+
+  updatePaths (): Iterator<[Path, NodeInfo]> {
+    return this._nodes.descendingEntries()
   }
 }
 
