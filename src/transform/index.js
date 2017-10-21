@@ -8,7 +8,7 @@ import State, { create as createState } from '~/transform/state'
 import * as util from '~/transform/util'
 import { parseProperty } from '~/parsing'
 
-const defaultKey = Symbol('default')
+const DEFAULT_KEY = Symbol('default')
 
 /**
  * Analysis a declaration and records any updates
@@ -16,8 +16,10 @@ const defaultKey = Symbol('default')
  *
  * @param state - The state of the transformation.
  * @param decl - A declartion that's being analysised.
+ * @param defaultKey - Default key for the key for the
+ * else clause.
  */
-export function readDecl (state: State, decl: Object) {
+export function readDecl (state: State, decl: Object, defaultKey: any = DEFAULT_KEY) {
   // parse the property and get the AST of the properties value
   const result = parseProperty(decl.value)
   switch (result.type) {
@@ -81,7 +83,7 @@ export function expandProperty (segments: Array<Segment>, defaultKey: any): Expa
     defaultState.values.set(i, value.default)
     defaultWasSpecified = defaultWasSpecified || (!! value.default)
 
-    // record each of the cases for the media query
+    // record each of the cases for the media query,
     for (const branch of value.cases) {
       const stateMaybe = stateForQueries.get(branch.media)
       const state = stateMaybe || initMediaState()
@@ -139,38 +141,25 @@ export function expandProperty (segments: Array<Segment>, defaultKey: any): Expa
   return { type: 'ok', value: resultMap }
 }
 
+type TransformCache = Map<Object, {
+  lastInsertedQuery: ?Object,
+  queryLookup: Map<string, Object>,
+}>
 
-function lookupMediaRule (
-  rule: Object,
-  mediaQuery: string,
-  map: Map<Object, Map<string, Object>>,
-): Object {
-  let queryMap = map.get(rule)
-  if (queryMap == null) {
-    queryMap = new Map()
-    map.set(rule, queryMap)
-  }
-
-  let mediaRule = queryMap.get(mediaQuery)
-  if (mediaRule == null) {
-    mediaRule = postcss.rule({ selector: rule.selector })
-
-    rule.after(postcss.atRule({
-      name: 'media',
-      params: mediaQuery,
-      nodes: [mediaRule],
-    }))
-
-    queryMap.set(mediaQuery, mediaRule)
-  }
-
-  return mediaRule
-}
-
-export function applyUpdate (state: State, root: Object, elseKey: any = defaultKey) {
-  // type Instruction = {}
-  // const instructions: Array<Instruction> = []
-  const map = new Map()
+/**
+ * Applies modifications to the abstract syntax tree needed to build out the
+ * different media queries for the different values.
+ *
+ * @param state - The state of the transformation.
+ * @param root - The root of the style AST.
+ * @param elseKey - If the key was overloaded in a previous pass then you can
+ * continue overloading in this function call.
+ */
+export function applyUpdate (state: State, root: Object, elseKey: any = DEFAULT_KEY) {
+  // Keeps track of rules that were made for, the most imporatnt part of this
+  // is respecting the order in which the media queries were declared as well
+  // as grouping additionally responsive values in the same media query.
+  const ruleCache: TransformCache = new Map()
 
   for (const [path, info] of state.updatePaths()) {
     const decl = util.lookup(path, root)
@@ -182,7 +171,7 @@ export function applyUpdate (state: State, root: Object, elseKey: any = defaultK
         clone.value = value
       }
       else {
-        const mediaRule = lookupMediaRule(rule, mediaQuery, map)
+        const mediaRule = lookupMediaRule(rule, mediaQuery, ruleCache)
         mediaRule.prepend(postcss.decl({ prop: info.propName, value }))
       }
     }
@@ -190,6 +179,57 @@ export function applyUpdate (state: State, root: Object, elseKey: any = defaultK
     // no long needed
     decl.remove()
   }
+}
+
+
+function lookupMediaRule (
+  rule: Object,
+  mediaQuery: string,
+  map: TransformCache,
+): Object {
+  let queryInfo = map.get(rule)
+  if (queryInfo == null) {
+    queryInfo = {
+      lastInsertedQuery: null,
+      queryLookup: new Map()
+    }
+    map.set(rule, queryInfo)
+  }
+
+  let mediaRule = queryInfo.queryLookup.get(mediaQuery)
+  if (mediaRule == null) {
+    mediaRule = postcss.rule({ selector: rule.selector })
+
+    const query = postcss.atRule({
+      name: 'media',
+      params: mediaQuery,
+      nodes: [mediaRule],
+    })
+
+    // # Why is there this logic for ordering of media query?
+    //
+    // Well, the map insert order is the same as the map
+    // iteration order which is pretty annoying. So that
+    // means the order in which the keys are defined will
+    // be the order in which they'll be inserted, if it
+    // was just appending to the end of the rule, that
+    // means the order of the media queries will be the
+    // reverse of how they were declared which isn't what
+    // we want. So we keep track of the last inserted media
+    // query for this rule.
+    const insertOnto = queryInfo.lastInsertedQuery != null
+      ? queryInfo.lastInsertedQuery
+      : rule
+
+    insertOnto.after(query)
+
+    // update this so the next media query for this rule
+    // will be added after this rule.
+    queryInfo.lastInsertedQuery = query
+    queryInfo.queryLookup.set(mediaQuery, mediaRule)
+  }
+
+  return mediaRule
 }
 
 export { createState }
