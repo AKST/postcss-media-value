@@ -14,16 +14,21 @@ yarn add @akst.io/postcss-media-value
 
 ## Features
 
-- Media dependent values
-- Values can be used as you would expect them to
+- **Value based**
+  - Designed for CSS Modules.
+- **Declaritive**
   - Can be nested in an expresssion like, `solid $borderSize black`
   - Properties can be the value itself like `$borderSize`
   - Properties can include multiple values `$verticalPadding $horizontalPadding`
-- Only produces as much output as required
-- Trys to retain the original ordering as much as possible
-  - There are currently some quirks that need to be addressed in some
-    edge cases, see [this issue][issue/1] for more information.
-
+  - Optional fallback
+- **Mimumimal output**
+  - Only produces as much output as required
+- **Correctness**
+  - Error messages for non exhaustive media queries when two values
+    are used to together
+  - Trys to retain the original ordering as much as possible
+    - There are currently some quirks that need to be addressed in some
+      edge cases, see [this issue][issue/1] for more information.
 
 [issue/1]: https://github.com/AKST/postcss-media-value/issues/1
 
@@ -33,15 +38,27 @@ Say you defined your config in some file, and you're using css modules.
 
 ```css
 /* app/styles/grid.css */
+@value mobile: only screen and (max-width: 375px);
+@value desktop: only screen and (min-width: 376px);
 
 /* ignore the terrible breakpoints */
 @value basePadding: media-value(
-  case: "only screen and (min-width: 1501px)" as: "50px",
-  case: "only screen and (min-width: 901px) and (max-width: 1500px)" as: "40px",
-  case: "only screen and (min-width: 601px) and (max-width: 900px)" as: "30px",
-  case: "only screen and (min-width: 376px) and (max-width: 600px)" as: "20px",
-  case: "only screen and (max-width: 375px)" as: "10px",
-  else: "0"
+  case: "desktop" as: "20px",
+  case: "mobile" as: "10px",
+  else: "0",
+);
+
+@value lineHeight: media-value(
+  case: "desktop" as: "20px",
+  case: "mobile" as: "16px",
+  else: "1em",
+);
+
+/* note that these media value arguements
+ * allow for trailing commas ;) */
+@value lineCount: media-value(
+  case: "desktop" as: "4",
+  else: "2"
 );
 ```
 
@@ -49,10 +66,11 @@ And you want to import, so you do so and use it like this.
 
 ```css
 @value grid: 'app/styles/grid';
-@value basePadding from grid;
+@value basePadding, lineHeight, lineCount from grid;
 
 .tile {
   padding: basePadding;
+  height: calc(lineHeight * lineCount);
 }
 ```
 
@@ -62,31 +80,24 @@ You end up with this.
 /* Note the 'else' caluse is the first rule as 'else'
  * kinda has fallback semantics. This way it has the
  * least priority. However if unspecified, the original
- * declartion will be removed.
- */
-.tile { padding: 0 }
+ * declartion will be removed. */
+.tile { padding: 0; height: calc(1em * 2); }
 
 /* Also note how the first rule in the value defintition
  * appears after the original rule. This way the is a sense
  * of predictable ordering. */
-@media only screen and (min-width: 1501px) {
-  .tile { padding: 50px; }
-}
-
-@media only screen and (min-width: 901px) and (max-width: 1500px) {
-  .tile { padding: 40px; }
-}
-
-@media only screen and (min-width: 601px) and (max-width: 900px) {
-  .tile { padding: 30px; }
-}
-
-@media only screen and (min-width: 376px) and (max-width: 600px) {
-  .tile { padding: 20px; }
+@media only screen and (min-width: 376px) {
+  /* note how the two properties who shared the media query
+   * didn't end up in a different rule */
+  .tile { padding: 20px; height: calc(20px * 4); }
 }
 
 @media only screen and (max-width: 375px) {
-  .tile { padding: 10px; }
+  /* note that even though we never specfied a case
+   * for this lineCount in this media query, it picked
+   * a value, and that's because a default value was
+   * specified for it. */
+  .tile { padding: 10px; height: calc(16px * 2); }
 }
 ```
 

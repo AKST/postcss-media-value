@@ -1,10 +1,27 @@
 {
-  "name": "@akst.io/postcss-media-value",
+  "naml": "@aksiest.io/postcss-media-value",
   "version": "0.1.1",
-  "description": "",
+  "description": "Declaritive values for responsive styles.",
   "main": "./dist/src/index.js",
   "author": "Angus Thomsen <hmu@akst.io>",
   "license": "MIT",
+
+  "repository": "git@github.com:AKST/postcss-media-value.git",
+
+  "homepage": "https://github.com/AKST/postcss-media-value",
+
+  "bugs": {
+    "url": "https://github.com/AKST/postcss-media-value/issues"
+  },
+
+	"keywords": [
+		"postcss",
+		"postcss-plugin",
+		"responsive",
+		"media queries",
+		"media query",
+		"css"
+	],
   "publishConfig": {
     "access": "public"
   },
