@@ -9,7 +9,6 @@
     case: "only screen and (max-width: 375px)" as: "10px",
     else: "0",
   ) black;
-
   padding: media-value(
     case: "only screen and (min-width: 1501px)" as: "20px",
     case: "only screen and (min-width: 901px) and (max-width: 1500px)" as: "15px",
@@ -18,13 +17,13 @@
     case: "only screen and (max-width: 375px)" as: "5px",
     else: "0",
   );
-
   font-size: 12px;
+}
 
-  &:placeholder {
-    opacity: media-value(
-      case: "only screen and (min-width: 1501px)" as: "0.8",
-      else: "0.5",
-    );
-  }
+
+.rule::placeholder {
+  opacity: media-value(
+    case: "only screen and (min-width: 1501px)" as: "0.8",
+    else: "0.5",
+  );
 }
