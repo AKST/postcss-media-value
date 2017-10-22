@@ -141,5 +141,5 @@ I prefer to let the linter define the rules, so just run `make lint`.
 [Flow]: https://flow.org
 [watchman]: https://facebook.github.io/watchman/
 [PostCSS]: http://postcss.org
-[CSSModules]: https://github.com/css-modules/css-moduless
+[CSSModules]: https://github.com/css-modules/css-modules
 [CSSModulesValues]: https://github.com/css-modules/postcss-icss-values
