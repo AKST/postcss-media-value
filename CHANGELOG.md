@@ -2,4 +2,8 @@
 
 ## v0.1.0
 
-Basic setup up, with css modules example.
+Simple MVP.
+
+- Many values in the same declartions value
+- Fallback values.
+- Mostly predictable ordering.
