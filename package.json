@@ -1,5 +1,5 @@
 {
-  "naml": "@aksiest.io/postcss-media-value",
+  "name": "@akst.io/postcss-media-value",
   "version": "0.1.2",
   "description": "Declaritive values for responsive styles.",
   "main": "./dist/src/index.js",
