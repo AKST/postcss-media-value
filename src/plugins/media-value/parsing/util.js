@@ -1,7 +1,6 @@
 // @flow
 import State from './state'
-
-const WHITESPACE_CHARS = [' ', '\n', '\t']
+import { isWhitespace } from '~/util/string'
 
 
 /**
@@ -62,7 +61,7 @@ export function matchString (state: State): StringMatch {
  * @param state - The parsers state.
  */
 export function skipWhitespace (state: State) {
-  while (WHITESPACE_CHARS.includes(state.head)) state.increment()
+  while (isWhitespace(state.head)) state.increment()
 }
 
 /**
