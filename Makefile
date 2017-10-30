@@ -16,10 +16,11 @@ flow-typed: node_modules
 
 build: node_modules
 	./node_modules/.bin/babel src --out-dir dist/src --source-maps inline
+	./node_modules/.bin/babel test --out-dir dist/test --source-maps inline
 	cp ./package.json ./dist/.
 
-test: node_modules
-	./node_modules/.bin/jest
+test: build node_modules
+	cd dist && ../node_modules/.bin/jest
 
 type: node_modules
 	./node_modules/.bin/flow status

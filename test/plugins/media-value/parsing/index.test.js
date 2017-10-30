@@ -1,4 +1,4 @@
-import * as parsing from '~/parsing'
+import * as parsing from '~/plugins/media-value/parsing'
 
 
 /*

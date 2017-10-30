@@ -1,6 +1,6 @@
 import Path from '~/data/path'
 import postcss from 'postcss'
-import * as transform from '~/transform/util'
+import * as transform from '~/plugins/media-value/transform/util'
 
 test('get path of a node', () => {
   const root = postcss.parse(`

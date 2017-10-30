@@ -1,5 +1,5 @@
 import * as postcss from 'postcss'
-import { withRoot } from '~/index'
+import { withRoot } from '~/plugins/media-value'
 
 test('just else clause', () => {
   const root = postcss.parse(`

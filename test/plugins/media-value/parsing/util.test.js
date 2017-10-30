@@ -1,5 +1,5 @@
-import { create as createState } from '~/parsing/state'
-import * as parsing from '~/parsing/util'
+import { create as createState } from '~/plugins/media-value/parsing/state'
+import * as parsing from '~/plugins/media-value/parsing/util'
 
 test('skipNextIf on match', () => {
   const input = `yo123`

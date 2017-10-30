@@ -1,4 +1,4 @@
-import * as transform from '~/transform'
+import * as transform from '~/plugins/media-value/transform'
 
 test('with single branch, with default', () => {
   const segments = [{

@@ -1,12 +1,14 @@
 // @flow
-import type { Segment } from '~/parsing'
-import type { MediaValueMap } from '~/transform/state'
+import type { Segment } from '~/plugins/media-value/parsing'
+import { parseProperty } from '~/plugins/media-value/parsing'
+
+import type { MediaValueMap } from './state'
+import State, { create as createState } from './state'
+import * as util from './util'
 
 import postcss from 'postcss'
 import { enumerate } from '~/util/iterators'
-import State, { create as createState } from '~/transform/state'
-import * as util from '~/transform/util'
-import { parseProperty } from '~/parsing'
+
 
 const DEFAULT_KEY = Symbol('default')
 
