@@ -1,6 +1,6 @@
 {
   "name": "@akst.io/postcss-media-value",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Declaritive values for responsive styles.",
   "main": "./dist/src/index.js",
   "author": "Angus Thomsen <hmu@akst.io>",
