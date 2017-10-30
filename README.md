@@ -8,8 +8,25 @@ with [CSS Modules values][CSSModulesValues].
 
 ## Installation
 
-```
+```bash
 yarn add @akst.io/postcss-media-value
+```
+
+Update your build
+
+```js
+/* "your build" */
+const postcssMediaValue = require('@akst.io/postcss-media-value');
+
+const plugins = [
+  // this is optional, but possibly required
+  // depending on your css modules implementation
+  new postcssMediaValue.CSSModulePrep({}),
+
+  new CSSModules({}),
+  new postcssMediaValue.MediaValue({}),
+];
+
 ```
 
 ## Features
@@ -100,6 +117,7 @@ You end up with this.
   .tile { padding: 10px; height: calc(16px * 2); }
 }
 ```
+
 
 ### More examples
 
