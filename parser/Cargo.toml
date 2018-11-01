@@ -1,0 +1,10 @@
+[package]
+name = "parser"
+version = "0.1.0"
+authors = ["akst <angus@canva.com>"]
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
