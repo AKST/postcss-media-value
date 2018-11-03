@@ -1,6 +1,7 @@
 ROOT=$(shell pwd)/..
-DOCS=../docs
-DIST=../dist
+SELF=$(shell pwd)
+DOCS=$(ROOT)/docs
+DIST=$(ROOT)/dist
 SYSTEM=$(shell uname)
 
 default: build
@@ -23,7 +24,9 @@ build: node_modules
 	cp ./package.json $(DIST)/.
 
 test: build node_modules
-	cd $(DIST) && ../node_modules/.bin/jest
+	[ -d $(DIST)/node_modules ] || ln -s $(SELF)/node_modules/ $(DIST)
+	cd $(DIST) && $(SELF)/node_modules/.bin/jest
+	unlink $(DIST)/node_modules
 
 type: node_modules
 	./node_modules/.bin/flow status
