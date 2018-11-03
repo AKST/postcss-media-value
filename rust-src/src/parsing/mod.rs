@@ -5,18 +5,19 @@ use self::data::{
   FailureReason,
   ParseError,
   ResponsiveTemplate,
-  ResponsiveValue,
 };
-use self::state::{State};
+use self::state::{State, Bookmark};
 
 const MEDIA_VALUE_FN_NAME: &'static str = "media-value";
 const CASE_KEYWORD: &'static str = "case";
 const ELSE_KEYWORD: &'static str = "else";
 const AS_KEYWORD: &'static str = "case";
 
-enum ResponsiveValueArg<'a> {
-  Case(&'a str, &'a str),
-  Else(&'a str),
+type ParseResult<T> = Result<T, ParseError>;
+
+enum ResponsiveValueArg {
+  Case(Bookmark, Bookmark),
+  Else(Bookmark),
 }
 
 /**
@@ -34,15 +35,15 @@ macro_rules! get_some {
   }
 }
 
-pub fn parse_property(input: &str) -> Result<ResponsiveTemplate, ParseError> {
+pub fn parse_property(input: &str) -> ParseResult<ResponsiveTemplate> {
   let mut state = State::create(input);
   let mut _segments: Vec<data::Segment> = vec![];
 
   while state.has_more() {
-    let start = get_some!(seek_media_value(&mut state));
+    let _start = get_some!(seek_media_value(&mut state));
     state.skip_whitespace();
 
-    //let _responsive_value = try!(parse_responsive_value(&mut state));
+    let _responsive_value = try!(parse_responsive_value(&mut state));
   }
 
   Err(failure(&state, FailureReason::NotImplemented))
@@ -67,13 +68,10 @@ macro_rules! fail_if_true {
   }
 }
 
-// fn parse_responsive_value<'b, 'a: 'b>(state: &'b mut State<'a>)
-//       -> Result<Option<Vec<ResponsiveValueArg<'b>>>, ParseError> {
-fn parse_responsive_value<'a, 'b: 'a, 'c: 'a>(state: &'b mut State<'a>)
-      -> Result<Option<Vec<ResponsiveValueArg<'c>>>, ParseError> {
+fn parse_responsive_value(state: &mut State) -> ParseResult<Option<Vec<ResponsiveValueArg>>> {
   if !state.skip_next_if("(") { return Ok(None) }
 
-  let mut args: Vec<ResponsiveValueArg<'c>> = vec![];
+  let mut args: Vec<ResponsiveValueArg> = vec![];
 
   loop {
     // check for closing paren

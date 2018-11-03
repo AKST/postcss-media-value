@@ -5,6 +5,11 @@ pub struct State<'a> {
   indices: Vec<(usize, char)>,
 }
 
+pub struct Bookmark {
+  start: usize,
+  end: usize,
+}
+
 pub enum SeekResult {
   CouldSeek,
   CannotSeek,
@@ -123,7 +128,7 @@ impl<'a> State<'a> {
     return SeekResult::CannotSeek
   }
 
-  pub fn match_string<'c, 'b: 'c>(self: &'b mut Self) -> Option<&'c str> {
+  pub fn match_string<'c, 'b: 'c>(self: &'b mut Self) -> Option<Bookmark> {
     let start = self.cursor;
     let quote_type = match self.get_head() {
       Some(a) if a == '"' => a,
@@ -148,6 +153,6 @@ impl<'a> State<'a> {
     self.increment();
     let slice_start = start + 1;
     let slice_end = self.cursor - 1;
-    return self.input.get(slice_start..slice_end);
+    return Some(Bookmark { start: slice_start, end: slice_end });
   }
 }
