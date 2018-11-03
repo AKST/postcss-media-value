@@ -1,3 +1,6 @@
+ROOT=$(shell pwd)/..
+DOCS=../docs
+DIST=../dist
 SYSTEM=$(shell uname)
 
 default: build
@@ -15,12 +18,12 @@ flow-typed: node_modules
 	./node_modules/.bin/flow-typed install
 
 build: node_modules
-	./node_modules/.bin/babel src --out-dir dist/src --source-maps inline
-	./node_modules/.bin/babel test --out-dir dist/test --source-maps inline
-	cp ./package.json ./dist/.
+	./node_modules/.bin/babel src --out-dir $(DIST)/src --source-maps inline
+	./node_modules/.bin/babel test --out-dir $(DIST)/test --source-maps inline
+	cp ./package.json $(DIST)/.
 
 test: build node_modules
-	cd dist && ../node_modules/.bin/jest
+	cd $(DIST) && ../node_modules/.bin/jest
 
 type: node_modules
 	./node_modules/.bin/flow status
@@ -30,7 +33,7 @@ lint: node_modules
 
 docs: node_modules
 	./node_modules/.bin/documentation build \
-		src/** src/* -f html -o docs \
+		src/** src/* -f html -o $(DOCS) \
 		--document-exported \
 		--infer-private \
 		--name jo-script
@@ -42,26 +45,25 @@ watch:
 reset:
 	rm -rf flow-typed
 	rm -rf node_modules
-	rm -rf dist
-	rm -rf docs
+	rm -rf $(DIST)
+	rm -rf $(DOCS)
 	make init
 
 clean:
-	rm -rf dist
+	rm -rf $(DIST)
 
 publish-build:
-	rm -rf dist
-	./node_modules/.bin/babel src --out-dir dist
-	rm -rf dist/test dist/fixtures dist/examples
-	cp package.json dist/.
-	cp README.md dist/.
-	cp CHANGELOG.md dist/.
+	./node_modules/.bin/babel src --out-dir $(DIST)
+	rm -rf $(DIST)/test $(DIST)/fixtures $(DIST)/examples
+	cp package.json $(DIST)/.
+	cp README.md $(DIST)/.
+	cp CHANGELOG.md $(DIST)/.
 
 publish: publish-build
 	npm version patch
-	cp package.json dist/.
-	cd dist && npm publish
-	cd ..
+	cp package.json $(DIST)/.
+	cd $(DIST) && npm publish
+	cd $(ROOT)
 	git push origin master --tags
 
 .PHONY: default watch ci init build clean docs type lint test
