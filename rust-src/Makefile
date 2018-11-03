@@ -1,10 +1,16 @@
 DIST=../dist
 EXTERN_DIR=../js-src/src/extern
+EXTERN_DIST=$(DIST)/src/extern
+TARGET_DIR=target/wasm32-unknown-unknown/debug
 NAME=parser
 
-default: init
+default: init $(EXTERN_DIR) $(EXTERN_DIST)
 	cargo +nightly build --target wasm32-unknown-unknown
-	wasm-bindgen target/wasm32-unknown-unknown/debug/$(NAME).wasm --out-dir $(EXTERN_DIR)
+	wasm-bindgen $(TARGET_DIR)/$(NAME).wasm --out-dir $(EXTERN_DIR)
+	wasm-bindgen $(TARGET_DIR)/$(NAME).wasm --out-dir $(EXTERN_DIST) --no-typescript
+	@# disables linting on these files.
+	find "$(EXTERN_DIR)" -name "*.js" \
+	| xargs -n 1 sed -i.old '1s;^;/* eslint-disable */;'
 
 ci: init
 	cargo test
@@ -25,4 +31,10 @@ flags/wasm-bindgen-cli: flags
 flags:
 	mkdir -p flags
 
-.PHONY: default
+$(EXTERN_DIR):
+	mkdir -p $(EXTERN_DIR)
+
+$(EXTERN_DIST):
+	mkdir -p $(EXTERN_DIST)
+
+.PHONY: default clean init ci
