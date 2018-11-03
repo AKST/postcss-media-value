@@ -5,6 +5,15 @@ pub enum ResponsiveTemplate {
 }
 
 pub enum ParseError {
+  At(usize, FailureReason),
+}
+
+pub enum FailureReason {
+  ExpectedChar(char),
+  ExpectedQuery,
+  ExpectedValue,
+  ExpectedAs,
+  ExpectedOneOf(Vec<String>),
 	NotImplemented
 }
 
