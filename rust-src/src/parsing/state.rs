@@ -1,13 +1,9 @@
+use super::bookmark::{Bookmark};
 
 pub struct State<'a> {
   pub input: &'a str,
   pub cursor: usize,
   indices: Vec<(usize, char)>,
-}
-
-pub struct Bookmark {
-  start: usize,
-  end: usize,
 }
 
 pub enum SeekResult {
@@ -29,10 +25,11 @@ impl<'a> State<'a> {
     return self.indices.get(self.cursor).map(|(_, c)| *c);
   }
 
-  fn get_remaining(self: &Self) -> Option<&'a str> {
-    let (start, _) = self.indices[self.cursor];
-    let end = self.input.len();
-    return self.input.get(start..end)
+  pub fn get_remaining(self: &Self) -> Option<Bookmark> {
+    return self.indices.get(self.cursor).map(|(start, _)| {
+      let end = self.input.len();
+      return Bookmark { start: *start, end }
+    })
   }
 
   pub fn has_more(self: &Self) -> bool {
@@ -56,24 +53,14 @@ impl<'a> State<'a> {
     return None
   }
 
-  pub fn slice_from_cursor(self: &Self, length: usize) -> Option<&'a str> {
-    let (start, _) = self.indices[self.cursor];
-    let (end, _) = self.indices[self.cursor + length];
-    return self.input.get(start..end);
-  }
-
-  pub fn slice_input(self: &Self, from: usize, to: usize) -> Option<&'a str> {
+  pub fn bookmark_input(self: &Self, from: usize, to: usize) -> Option<Bookmark> {
     let (start, _) = self.indices[from];
     let (end, _) = self.indices[to];
-    return self.input.get(start..end);
+    return Some(Bookmark { start, end });
   }
 
   pub fn increment(self: &mut Self) {
     self.cursor += 1;
-  }
-
-  pub fn increment_by(self: &mut Self, amount: usize) {
-    self.cursor += amount;
   }
 
   pub fn increment_over(self: &mut Self, string: &str) {
