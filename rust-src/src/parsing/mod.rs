@@ -8,7 +8,7 @@ use self::state::{State};
 const MEDIA_VALUE_FN_NAME: &'static str = "media-value";
 const CASE_KEYWORD: &'static str = "case";
 const ELSE_KEYWORD: &'static str = "else";
-const AS_KEYWORD: &'static str = "case";
+const AS_KEYWORD: &'static str = "as";
 
 type ParseResult<T> = Result<T, data::ParseError>;
 

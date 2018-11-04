@@ -4,12 +4,17 @@
 extern crate wasm_bindgen;
 extern crate js_sys;
 
-mod debug;
 pub mod parsing;
 
 use wasm_bindgen::prelude::*;
 use parsing::data::{ResponsiveTemplate, ParseError};
 use parsing::{parse_property_bookmark};
+
+#[wasm_bindgen]
+extern "C" {
+  #[wasm_bindgen(js_namespace=console, js_name=log)]
+  pub fn console_log(s: &str);
+}
 
 /**
  * So turns out we cannot expose method or expect the
@@ -27,10 +32,10 @@ pub fn did_parse_property(result: &ParseResult) -> bool {
   }
 }
 
-#[wasm_bindgen(js_name = logFailure)]
-pub fn log_failure(result: &ParseResult) {
+#[wasm_bindgen(js_name = logParsePropertyFailure)]
+pub fn log_parse_property_failure(result: &ParseResult) {
   if let ParseResult(Err(e)) = result {
-    println!("{}", e);
+    console_log(&format!("{}", e));
   }
 }
 
