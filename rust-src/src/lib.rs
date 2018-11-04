@@ -11,12 +11,18 @@ use parsing::{parse_property_bookmark};
 #[wasm_bindgen]
 pub struct ParseResult(Result<ResponsiveTemplate<String>, String>);
 
-impl ParseResult {
-  pub fn get_result(self: Self) -> Option<ResponsiveTemplate<String>> {
-    match self {
-      ParseResult(Ok(r)) => Some(r),
-      ParseResult(Err(_)) => None,
-    }
+#[wasm_bindgen]
+pub fn did_parse(result: &ParseResult) -> bool {
+  match result {
+    ParseResult(Err(_)) => false,
+    ParseResult(Ok(_)) => true,
+  }
+}
+
+#[wasm_bindgen]
+pub fn log_failure(result: &ParseResult) {
+  if let ParseResult(Err(e)) = result {
+    println!("{}", e);
   }
 }
 
