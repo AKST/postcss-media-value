@@ -1,3 +1,5 @@
+use std::fmt;
+
 pub struct Bookmark {
   pub start: usize,
   pub end: usize,
@@ -17,6 +19,10 @@ impl Bookmark {
     return s.get(self.start..self.end);
   }
 
+  pub fn checkout_owned(self: &Self, s: &str) -> Option<String> {
+    return self.checkout(s).map(|s| s.to_string());
+  }
+
   pub fn checkout_result<'a>(self: Self, s: &'a str) -> Result<&'a str, CheckoutError> {
     return self.checkout(s).map_or(
         Err(CheckoutError::At(self)),
@@ -25,6 +31,11 @@ impl Bookmark {
   }
 }
 
+impl fmt::Display for Bookmark {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({} {})", self.start, self.end)
+    }
+}
 
 pub fn option_checkout_result<T, F>(option: Option<Bookmark>, f: F)
     -> Result<Option<T>, CheckoutError>
