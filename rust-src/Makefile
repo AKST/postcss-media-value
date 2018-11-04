@@ -1,8 +1,8 @@
 DIST=../dist
-EXTERN_DIR=../js-src/src/extern
-EXTERN_DIST=$(DIST)/src/extern
+EXTERN_DIR=../js-src/src/core
+EXTERN_DIST=$(DIST)/src/core
 TARGET_DIR=target/wasm32-unknown-unknown/debug
-NAME=parser
+NAME=postcss_media_value_core
 
 default: init $(EXTERN_DIR) $(EXTERN_DIST)
 	cargo +nightly build --target wasm32-unknown-unknown
