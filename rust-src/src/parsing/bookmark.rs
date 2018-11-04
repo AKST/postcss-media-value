@@ -6,7 +6,6 @@ pub struct Bookmark {
   pub end: usize,
 }
 
-
 pub enum CheckoutError {
   At(Bookmark),
 }
@@ -29,22 +28,23 @@ impl Bookmark {
   }
 
   pub fn checkout_result<'a>(self: Self, s: &'a str) -> Result<&'a str, CheckoutError> {
-    return self.checkout(s).map_or(
-        Err(CheckoutError::At(self)),
-        Ok,
-    );
+    return self.checkout(s).map_or(Err(CheckoutError::At(self)), Ok);
   }
 }
 
 impl fmt::Display for Bookmark {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({} {})", self.start, self.end)
-    }
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "({} {})", self.start, self.end)
+  }
 }
 
-pub fn option_checkout_result<T, F>(option: Option<Bookmark>, f: F)
-    -> Result<Option<T>, CheckoutError>
-    where F: Fn(&Bookmark) -> Option<T> {
+pub fn option_checkout_result<T, F>(
+  option: Option<Bookmark>,
+  f: F,
+) -> Result<Option<T>, CheckoutError>
+where
+  F: Fn(&Bookmark) -> Option<T>,
+{
   match option {
     None => Ok(None),
     Some(b) => match f(&b) {

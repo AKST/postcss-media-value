@@ -1,9 +1,9 @@
-pub mod data;
 mod bookmark;
+pub mod data;
 mod state;
 
-use self::bookmark::{Bookmark};
-use self::state::{State};
+use self::bookmark::Bookmark;
+use self::state::State;
 
 const MEDIA_VALUE_FN_NAME: &'static str = "media-value";
 const CASE_KEYWORD: &'static str = "case";
@@ -20,20 +20,18 @@ macro_rules! get_some {
   ($e:expr) => {
     if let Some(value) = $e {
       value
+    } else {
+      break;
     }
-    else {
-      break
-    }
-  }
+  };
 }
 
 pub fn parse_property<'a>(input: &'a str) -> ParseResult<data::ResponsiveTemplate<&'a str>> {
-  return parse_property_bookmark(input)
-    .and_then(|r| r.checkout(input).map_err(From::from));
+  return parse_property_bookmark(input).and_then(|r| r.checkout(input).map_err(From::from));
 }
 
 pub fn parse_property_bookmark(input: &str) -> ParseResult<data::ResponsiveTemplate<Bookmark>> {
-  use parsing::data::{Segment, ResponsiveTemplate};
+  use parsing::data::{ResponsiveTemplate, Segment};
 
   let mut state = State::create(input);
   let mut segments: Vec<Segment<Bookmark>> = vec![];
@@ -67,11 +65,10 @@ macro_rules! some_or_fail {
   ($state:expr, $option:expr, $reason:expr) => {
     if let Some(value) = $option {
       value
-    }
-    else {
+    } else {
       return Err(failure($state, $reason));
     }
-  }
+  };
 }
 
 macro_rules! fail_if_true {
@@ -79,7 +76,7 @@ macro_rules! fail_if_true {
     if $bool {
       return Err(failure($state, $reason));
     }
-  }
+  };
 }
 
 enum MediaValueArg {
@@ -88,9 +85,11 @@ enum MediaValueArg {
 }
 
 fn parse_media_value_args(state: &mut State) -> ParseResult<Option<Vec<MediaValueArg>>> {
-  use parsing::data::{FailureReason};
+  use parsing::data::FailureReason;
 
-  if !state.skip_next_if("(") { return Ok(None) }
+  if !state.skip_next_if("(") {
+    return Ok(None);
+  }
 
   let mut args: Vec<MediaValueArg> = vec![];
 
@@ -99,11 +98,10 @@ fn parse_media_value_args(state: &mut State) -> ParseResult<Option<Vec<MediaValu
     state.skip_whitespace();
 
     if state.get_head() == Some(')') {
-      break
-    }
-    else if state.skip_next_if(CASE_KEYWORD) {
+      break;
+    } else if state.skip_next_if(CASE_KEYWORD) {
       state.skip_whitespace();
-      fail_if_true!(state, !state.skip_next_if(":") , FailureReason::ExpectedChar(':'));
+      fail_if_true!(state, !state.skip_next_if(":"), FailureReason::ExpectedChar(':'));
 
       state.skip_whitespace();
       let media = some_or_fail!(state, state.match_string(), FailureReason::ExpectedQuery);
@@ -119,20 +117,15 @@ fn parse_media_value_args(state: &mut State) -> ParseResult<Option<Vec<MediaValu
 
       state.skip_whitespace();
       args.push(MediaValueArg::Case(media, value));
-    }
-    else if state.skip_next_if(ELSE_KEYWORD) {
+    } else if state.skip_next_if(ELSE_KEYWORD) {
       state.skip_whitespace();
       let value = some_or_fail!(state, state.match_string(), FailureReason::ExpectedValue);
 
       state.skip_whitespace();
       args.push(MediaValueArg::Else(value));
-    }
-    else {
-      let one_of = vec![
-        "closing paren".to_string(),
-        "case keyword".to_string(),
-        "else keyword".to_string(),
-      ];
+    } else {
+      let one_of =
+        vec!["closing paren".to_string(), "case keyword".to_string(), "else keyword".to_string()];
       return Err(failure(state, FailureReason::ExpectedOneOf(one_of)));
     }
   }
@@ -142,25 +135,25 @@ fn parse_media_value_args(state: &mut State) -> ParseResult<Option<Vec<MediaValu
   return Ok(Some(args));
 }
 
-fn args_to_value(state: &State, args: Vec<MediaValueArg>)
-    -> ParseResult<data::ResponsiveValue<Bookmark>> {
-  use parsing::data::{FailureReason};
+fn args_to_value(
+  state: &State,
+  args: Vec<MediaValueArg>,
+) -> ParseResult<data::ResponsiveValue<Bookmark>> {
+  use parsing::data::FailureReason;
 
   let mut default: Option<Bookmark> = None;
   let mut cases: Vec<data::Case<Bookmark>> = vec![];
 
   for item in args.into_iter() {
     match item {
-      MediaValueArg::Case(media, value) =>
-        cases.push(data::Case { media, value }),
-      MediaValueArg::Else(value) =>
-        match default {
-          None => default = Some(value),
-          Some(_) => return Err(failure(state, FailureReason::TooManyElseClauses)),
-        }
+      MediaValueArg::Case(media, value) => cases.push(data::Case { media, value }),
+      MediaValueArg::Else(value) => match default {
+        None => default = Some(value),
+        Some(_) => return Err(failure(state, FailureReason::TooManyElseClauses)),
+      },
     }
   }
-  return Ok(data::ResponsiveValue { cases, default })
+  return Ok(data::ResponsiveValue { cases, default });
 }
 
 fn seek_media_value(state: &mut State) -> Option<Bookmark> {
@@ -173,15 +166,14 @@ fn seek_media_value(state: &mut State) -> Option<Bookmark> {
         state.increment_over(MEDIA_VALUE_FN_NAME);
         return start;
       });
-    },
+    }
     state::SeekResult::CannotSeek => {
       state.override_cursor(initial_cursor);
-      return None
+      return None;
     }
   }
 }
 
 fn failure(state: &State, reason: data::FailureReason) -> data::ParseError {
-  return data::ParseError::At(state.cursor, reason)
+  return data::ParseError::At(state.cursor, reason);
 }
-

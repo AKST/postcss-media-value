@@ -1,14 +1,14 @@
 #![feature(custom_attribute)]
 #![feature(unrestricted_attribute_tokens)]
 
-extern crate wasm_bindgen;
 extern crate js_sys;
+extern crate wasm_bindgen;
 
 pub mod parsing;
 
+use parsing::data::{ParseError, ResponsiveTemplate};
+use parsing::parse_property_bookmark;
 use wasm_bindgen::prelude::*;
-use parsing::data::{ResponsiveTemplate, ParseError};
-use parsing::{parse_property_bookmark};
 
 #[wasm_bindgen]
 extern "C" {

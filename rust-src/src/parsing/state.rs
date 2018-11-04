@@ -1,4 +1,4 @@
-use super::bookmark::{Bookmark};
+use super::bookmark::Bookmark;
 
 pub struct State<'a> {
   pub input: &'a str,
@@ -28,20 +28,20 @@ impl<'a> State<'a> {
   pub fn get_remaining(self: &Self) -> Option<Bookmark> {
     return self.indices.get(self.cursor).map(|(start, _)| {
       let end = self.input.len();
-      return Bookmark { start: *start, end }
-    })
+      return Bookmark { start: *start, end };
+    });
   }
 
   pub fn has_more(self: &Self) -> bool {
-    return self.cursor < self.indices.len()
+    return self.cursor < self.indices.len();
   }
 
   pub fn look_back(self: &Self, depth: usize) -> Option<char> {
     if depth <= self.cursor {
       let (_, c) = self.indices[self.cursor - depth];
-      return Some(c)
+      return Some(c);
     }
-    return None
+    return None;
   }
 
   pub fn nth_from_cursor(self: &Self, nth: usize) -> Option<char> {
@@ -50,7 +50,7 @@ impl<'a> State<'a> {
       let (_, c) = self.indices[offset];
       return Some(c);
     }
-    return None
+    return None;
   }
 
   pub fn bookmark_input(self: &Self, from: usize, to: usize) -> Option<Bookmark> {
@@ -81,7 +81,9 @@ impl<'a> State<'a> {
   pub fn skip_whitespace(self: &mut Self) {
     // unsafe { debug::log("skipping_whitespace"); }
     while let Some(head) = self.get_head() {
-      if !head.is_whitespace() { break }
+      if !head.is_whitespace() {
+        break;
+      }
       self.increment();
     }
   }
@@ -105,13 +107,13 @@ impl<'a> State<'a> {
           (Some(a), b) if a == b => continue,
           (Some(_), _) => {
             self.increment();
-            break
-          },
+            break;
+          }
         }
       }
-      return SeekResult::CouldSeek
+      return SeekResult::CouldSeek;
     }
-    return SeekResult::CannotSeek
+    return SeekResult::CannotSeek;
   }
 
   pub fn match_string<'c, 'b: 'c>(self: &'b mut Self) -> Option<Bookmark> {
@@ -125,12 +127,11 @@ impl<'a> State<'a> {
     loop {
       self.increment();
       match self.get_head() {
-        Some(c) if c == quote_type =>
-          match self.look_back(1) {
-            Some(d) if d == '\\' => continue,
-            Some(_) => break,
-            None => return None,
-          },
+        Some(c) if c == quote_type => match self.look_back(1) {
+          Some(d) if d == '\\' => continue,
+          Some(_) => break,
+          None => return None,
+        },
         Some(_) => continue,
         None => return None,
       }
@@ -145,8 +146,8 @@ impl<'a> State<'a> {
 
 #[cfg(test)]
 mod tests {
-  use parsing::bookmark::{Bookmark};
-  use super::{State};
+  use super::State;
+  use parsing::bookmark::Bookmark;
 
   const STRING: &'static str = "sally sells seashells";
 
@@ -194,7 +195,6 @@ mod tests {
     // look ahad      ----------^
     assert!(state.nth_from_cursor(10) == Some('h'));
   }
-
 
   #[test]
   fn increment_works() {
