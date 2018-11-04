@@ -1,5 +1,6 @@
 use std::fmt;
 
+#[derive(Eq, PartialEq)]
 pub struct Bookmark {
   pub start: usize,
   pub end: usize,
@@ -11,6 +12,10 @@ pub enum CheckoutError {
 }
 
 impl Bookmark {
+  pub fn create(start: usize, end: usize) -> Self {
+    Bookmark { start, end }
+  }
+
   pub fn is_empty(self: &Self) -> bool {
     return self.start == self.end;
   }

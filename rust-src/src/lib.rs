@@ -1,33 +1,41 @@
 #![feature(custom_attribute)]
+#![feature(unrestricted_attribute_tokens)]
 
 extern crate wasm_bindgen;
+extern crate js_sys;
 
+mod debug;
 pub mod parsing;
 
 use wasm_bindgen::prelude::*;
 use parsing::data::{ResponsiveTemplate, ParseError};
 use parsing::{parse_property_bookmark};
 
+/**
+ * So turns out we cannot expose method or expect the
+ * user of these functions to be able to travser our
+ * data types.
+ */
 #[wasm_bindgen]
 pub struct ParseResult(Result<ResponsiveTemplate<String>, String>);
 
-#[wasm_bindgen]
-pub fn did_parse(result: &ParseResult) -> bool {
+#[wasm_bindgen(js_name = didParseProperty)]
+pub fn did_parse_property(result: &ParseResult) -> bool {
   match result {
     ParseResult(Err(_)) => false,
     ParseResult(Ok(_)) => true,
   }
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = logFailure)]
 pub fn log_failure(result: &ParseResult) {
   if let ParseResult(Err(e)) = result {
     println!("{}", e);
   }
 }
 
-#[wasm_bindgen]
-pub fn parse(input: &str) -> ParseResult {
+#[wasm_bindgen(js_name = parseProperty)]
+pub fn parse_property(input: &str) -> ParseResult {
   ParseResult(run_parse(input).map_err(|e| e.to_string(input)))
 }
 

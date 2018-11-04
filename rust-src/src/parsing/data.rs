@@ -4,7 +4,6 @@ use super::bookmark::{
   option_checkout_result,
 };
 
-#[wasm_bindgen]
 pub enum ResponsiveTemplate<T> {
 	Responsive(Vec<Segment<T>>),
 	Normal,
@@ -15,7 +14,6 @@ pub enum ParseError {
   FailedToCheckoutOut(Bookmark)
 }
 
-#[wasm_bindgen]
 pub enum FailureReason {
   ExpectedChar(char),
   ExpectedQuery,
@@ -26,19 +24,16 @@ pub enum FailureReason {
   TooManyElseClauses,
 }
 
-#[wasm_bindgen]
 pub enum Segment<T> {
 	Text(T),
 	Value(ResponsiveValue<T>),
 }
 
-#[wasm_bindgen]
 pub struct ResponsiveValue<T> {
 	pub cases: Vec<Case<T>>,
 	pub default: Option<T>,
 }
 
-#[wasm_bindgen]
 pub struct Case<T> {
   pub media: T,
   pub value: T,

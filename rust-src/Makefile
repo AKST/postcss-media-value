@@ -6,7 +6,7 @@ NAME=postcss_media_value_core
 
 default: init $(EXTERN_DIR) $(EXTERN_DIST)
 	cargo +nightly build --target wasm32-unknown-unknown
-	@wasm-bindgen $(TARGET_DIR)/$(NAME).wasm --out-dir $(EXTERN_DIR)
+	@wasm-bindgen $(TARGET_DIR)/$(NAME).wasm --out-dir $(EXTERN_DIR) --nodejs
 	@wasm-bindgen $(TARGET_DIR)/$(NAME).wasm --out-dir $(EXTERN_DIST) --no-typescript
 	@# disables linting on these files.
 	@find "$(EXTERN_DIR)" -name "*.js" \

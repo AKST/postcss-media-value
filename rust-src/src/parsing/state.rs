@@ -79,10 +79,9 @@ impl<'a> State<'a> {
   }
 
   pub fn skip_whitespace(self: &mut Self) {
-    loop {
-      let (_, head) = self.indices[self.cursor];
-      if head.is_whitespace() { break }
-
+    // unsafe { debug::log("skipping_whitespace"); }
+    while let Some(head) = self.get_head() {
+      if !head.is_whitespace() { break }
       self.increment();
     }
   }
@@ -141,5 +140,83 @@ impl<'a> State<'a> {
     let slice_start = start + 1;
     let slice_end = self.cursor - 1;
     return Some(Bookmark { start: slice_start, end: slice_end });
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use parsing::bookmark::{Bookmark};
+  use super::{State};
+
+  const STRING: &'static str = "sally sells seashells";
+
+  #[test]
+  fn getters_work() {
+    let state = State { cursor: 6, ..State::create(&STRING) };
+    // string: "sally sells seashells";
+    // cursor   ------^
+
+    // there is no unicode so it should be equal.
+    assert!(state.length() == STRING.len());
+    assert!(state.get_head() == Some('s'));
+    assert!(state.has_more());
+
+    let remaining = Bookmark::create(6, STRING.len());
+    assert!(state.get_remaining() == Some(remaining));
+  }
+
+  #[test]
+  fn look_back_works() {
+    let state = State { cursor: 6, ..State::create(&STRING) };
+    // string: "sally sells seashells";
+    // cursor   ------^
+
+    // string: "sally sells seashells"
+    // look back    ^--
+    assert!(state.look_back(2) == Some('y'));
+  }
+
+  #[test]
+  fn nth_from_cursor_works() {
+    let state = State { cursor: 6, ..State::create(&STRING) };
+    // string: "sally sells seashells";
+    // cursor   ------^
+
+    // string: "sally sells seashells"
+    // look ahad      -^
+    assert!(state.nth_from_cursor(1) == Some('e'));
+
+    // string: "sally sells seashells"
+    // look ahad      ---------^
+    assert!(state.nth_from_cursor(9) == Some('s'));
+
+    // string: "sally sells seashells"
+    // look ahad      ----------^
+    assert!(state.nth_from_cursor(10) == Some('h'));
+  }
+
+
+  #[test]
+  fn increment_works() {
+    let mut state = State::create("abcd");
+    state.increment();
+    assert!(state.cursor == 1);
+    assert!(state.get_head() == Some('b'));
+  }
+
+  #[test]
+  fn skip_whitespace_works() {
+    let mut state = State::create("   a");
+    state.skip_whitespace();
+    assert!(state.cursor == 3 as usize);
+    assert!(state.get_head() == Some('a'));
+  }
+
+  #[test]
+  fn skip_whitespace_works_with_just_whitespace() {
+    let mut state = State::create("   ");
+    state.skip_whitespace();
+    assert!(state.cursor == 3);
+    assert!(state.get_head() == None);
   }
 }
